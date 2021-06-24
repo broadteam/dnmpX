@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+    # php7.4-fpm运行环境，也是网络名称
+    php7_4:
+        build:
+            # 从根目录下的php74文件夹下构建
+            context: ./services/php7.4
+            # 环境变量传入
+            args:
+                TIMEZONE: ${TIMEZONE}
+                CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+                COMPOSER_MIRRORS_URL: ${COMPOSER_MIRRORS_URL}
+        # 容器名称
+        container_name: "php7_4"
+        # 容器的权限设置（privileged/cap-add/cap-drop）
+        cap_add:
+            - SYS_PTRACE
+        # 端口映射（不需要暴露端口）
+        ports:
+            - "${PHP7_4_FPM_EXPOSED_PORT}:9000"
+        extra_hosts:
+            - "customer-pc.dev.com:${MAIN_HOST_IP}"
+            - "pc-server.dev.com:${MAIN_HOST_IP}"
+        volumes:
+            # 挂载web项目目录至容器
+            - ~/data/webroot:/home/www:rw
+        restart: always
+        # 网络
+        networks:
+            - default
+            - dev-network
+networks:
+    #default:
+    dev-network:
+        #external: true
+        driver: bridge
+        ipam:
+            config:
+                # 子网络
+                - subnet: 10.8.0.0/16

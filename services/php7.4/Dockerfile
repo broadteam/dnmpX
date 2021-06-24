@@ -1,0 +1,106 @@
+# [构建第一阶段]
+FROM daocloud.io/library/php:7.4.10-fpm-alpine AS build_env
+
+# 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
+ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
+
+MAINTAINER <Jueluo chaoyue@live.com>
+
+# 更新为国内镜像
+RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi
+
+# 安装telnet/vim/git工具
+RUN apk add --no-cache busybox-extras vim git
+
+# 安装编译工具（多个RUN可以分层编译，更容易排查错误）
+RUN apk add --no-cache autoconf file g++ gcc libtool libc-dev make
+RUN apk add --no-cache ca-certificates curl tar xz openssl zlib-dev dpkg-dev dpkg pkgconf re2c
+RUN apk add --no-cache --virtual .build-deps argon2-dev coreutils curl-dev libedit-dev libsodium-dev libxml2-dev
+RUN apk add --no-cache linux-headers oniguruma-dev openssl-dev sqlite-dev
+RUN apk add --no-cache krb5-dev openldap openldap-dev
+RUN apk add --no-cache bzip2-dev libpng-dev libwebp-dev libjpeg libjpeg-turbo-dev freetype-dev gettext-dev libxslt-dev libzip-dev readline-dev
+
+# 编译安装缺少的系统扩展
+RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar ctype curl exif fileinfo filter ftp
+RUN docker-php-ext-install -j$(nproc) gd iconv json ldap mbstring opcache
+RUN docker-php-ext-install -j$(nproc) pcntl pdo pdo_mysql pdo_sqlite phar posix mysqli
+RUN docker-php-ext-install -j$(nproc) readline session shmop simplexml soap
+RUN docker-php-ext-install -j$(nproc) sockets sodium sysvmsg sysvsem sysvshm tokenizer xsl zip
+
+#RUN docker-php-ext-enable
+
+# 编译redis扩展
+RUN pecl install redis \
+&& touch /usr/local/etc/php/conf.d/redis.ini \
+&& echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini
+
+# 编译swoole扩展
+RUN pecl install swoole \
+&& touch /usr/local/etc/php/conf.d/swoole.ini \
+&& echo "extension=swoole.so" > /usr/local/etc/php/conf.d/swoole.ini
+
+# 编译seaslog扩展
+RUN pecl install SeasLog \
+&& touch /usr/local/etc/php/conf.d/seaslog.ini \
+&& echo "extension=seaslog.so" > /usr/local/etc/php/conf.d/seaslog.ini
+
+# 编译yaf扩展
+RUN pecl install yaf \
+&& touch /usr/local/etc/php/conf.d/yaf.ini \
+&& echo "extension=yaf.so" > /usr/local/etc/php/conf.d/yaf.ini
+
+# 编译yar扩展
+RUN pecl install yar \
+&& touch /usr/local/etc/php/conf.d/yar.ini \
+&& echo "extension=yar.so" > /usr/local/etc/php/conf.d/yar.ini
+
+# 关掉默认Opcache缓存
+RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+# 统一扩展文件权限
+&& chmod -R +x /usr/local/lib/php/extensions/no-debug-non-zts-*/
+
+# [构建第二阶段]
+FROM daocloud.io/library/php:7.4.10-fpm-alpine
+
+# 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
+ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
+ARG COMPOSER_MIRRORS_URL=mirrors.aliyun.com
+
+MAINTAINER <Jueluo chaoyue@live.com>
+
+# 更新为国内镜像
+RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi \
+
+# 安装composer
+&& curl -o /usr/bin/composer https://${COMPOSER_MIRRORS_URL}/composer/composer.phar \
+&& chmod +x /usr/bin/composer \
+&& /usr/bin/composer config -g repo.packagist composer https://${COMPOSER_MIRRORS_URL}/composer/ \
+
+# 赋予SeasLog日志目录权限
+&& mkdir -p /var/log/www/default && chmod -R 777 /var/log/www \
+
+# 清除缓存
+&& rm -rf /var/cache/apk*
+
+# 从编译阶段的中拷贝编译结果到当前镜像中
+COPY --from=build_env /usr/lib /usr/lib
+COPY --from=build_env /usr/local/php /usr/local/php
+COPY --from=build_env /usr/local/lib/php /usr/local/lib/php
+COPY --from=build_env /usr/local/etc/php /usr/local/etc/php
+COPY --from=build_env /usr/local/include/php /usr/local/include/php
+COPY --from=build_env /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+
+# 从第一阶段复制vim到当前容器
+COPY --from=build_env /usr/bin/vim /usr/bin/vim
+COPY --from=build_env /usr/share/vim /usr/share/vim
+COPY --from=build_env /etc/vim /etc/vim
+
+# 从第一阶段复制git到当前容器
+COPY --from=build_env /usr/bin/git /usr/bin/git
+COPY --from=build_env /usr/libexec/git-core/git /usr/libexec/git-core/git
+COPY --from=build_env /var/git /var/git
+
+# 安全起见不用root账号，新建用户admin
+#RUN adduser -Dh /home/admin admin
+
+WORKDIR /home/www
