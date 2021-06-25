@@ -9,7 +9,7 @@ ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk/jre
 
 # 直接将以前编译好的文件复制到扩展目录
-COPY plugins/ /usr/share/elasticsearch/plugins/
+ADD ./plugins/* /usr/share/elasticsearch/plugins/
 
 # 更新为国内镜像
 RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi

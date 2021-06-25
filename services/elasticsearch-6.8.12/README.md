@@ -1,14 +1,20 @@
-### 开发版 vs 正式版 区别
-
-`开发版`：占用空间比较大！用于在基础镜像上编译安装扩展等。
-
-`正式版`：占用空间小！用于日常镜像。
-
-### 构建方法
+### 单个项目构建方法
 
 切换到当前目录下，然后：
 
+```
+docker build -t elasticsearch:6.8.12-alpine ./
+```
+
+Options 常用参数：
+
+- -t: 打包出镜像的名称及标签，通常写法为 name:tag
+- --rm: 构建成功后，删除中间产生的容器。
+- --force-rm=true: 无论是否构建成功，都删除中间产生的容器
+- --no-cache: 构建镜像时不使用缓存。
+- -f: 指定 DockerFile 的路径
 
 ```
-docker build -t elasticsearch:6.8.12 ./
+docker build --force-rm --no-cache -t elasticsearch:6.8.12-alpine .
 ```
+

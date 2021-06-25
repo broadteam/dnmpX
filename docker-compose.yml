@@ -2,7 +2,7 @@ version: "3"
 
 services:
     # NGINX
-    nginx:
+    nginx1_19:
         build:
             # 从根目录下的nginx文件夹下构建
             context: ./services/nginx
@@ -10,16 +10,16 @@ services:
                 TIMEZONE: ${TIMEZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         # 容器名称
-        container_name: "nginx"
+        container_name: "nginx1_19"
         ports:
-            - "80:80"
+            - "${NGINX1_19_EXPOSED_PORT}:80"
         links:
              - php7_4
         volumes:
             # 挂载nginx配置至容器
             - ./volumes/nginx/conf.d:/etc/nginx/conf.d:rw
             # 挂载web项目目录至容器
-            - ~/data/webroot:/home/www:rw
+            - ${WEBROOT_ROOT_PATH}:/home/www:rw
         environment:
             TZ: "$TIMEZONE"
         restart: always
@@ -33,7 +33,7 @@ services:
             context: ./services/mysql5.7
             args:
                 TIMEZONE: ${TIMEZONE}
-                MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+                MYSQL_ROOT_PASSWORD: ${MYSQL5_7_ROOT_PASSWORD}
         # 容器名称
         container_name: "mysql5_7"
         #image: mysql57:latest
@@ -41,12 +41,68 @@ services:
             - SYS_PTRACE
         # 端口映射（不需要暴露端口）
         ports:
-            - "3306:3306"
+            - "${MYSQL5_7_EXPOSED_PORT}:3306"
         volumes:
             # 将mysql配置复制过去
             - ./volumes/mysql/5.7/my.cnf:/etc/my.cnf:rw
             # 将mysql数据库目录映射至容器
             - ~/data/db/mysql/5.7/data:/var/lib/mysql:rw
+        restart: always
+        # 网络
+        networks:
+            - default
+            - dev-network
+    # es6_8_12运行环境，也是网络名称
+    elasticsearch6_8:
+        build:
+            # 从根目录下的elasticsearch-6.8.12文件夹下构建
+            context: ./services/elasticsearch-6.8.12
+            args:
+                TIMEZONE: ${TIMEZONE}
+                CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        # 容器名称
+        container_name: "elasticsearch6_8"
+        cap_add:
+            - SYS_PTRACE
+        # 端口映射（不需要暴露端口）
+        ports:
+            - "${ES6_8_EXPOSED_PORT}:9200"
+        volumes:
+            # 挂载es配置至容器
+            - ./volumes/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:rw
+            # 挂载es数据库目录至容器
+            - ${ES6_8_DATA_PATH}:/usr/share/elasticsearch/data:rw
+            # 挂载es日志目录至容器
+            - ${ES6_8_LOGS_PATH}:/usr/share/elasticsearch/logs:rw
+        restart: always
+        # 网络
+        networks:
+            - default
+            - dev-network
+    # redis6.2运行环境，也是网络名称
+    redis6_2:
+        build:
+            # 从根目录下的redis文件夹下构建
+            context: ./services/redis
+            args:
+                TIMEZONE: ${TIMEZONE}
+                CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        # 容器名称
+        container_name: "redis6_2"
+        cap_add:
+            - SYS_PTRACE
+        # 端口映射（不需要暴露端口）
+        ports:
+            - "${REDIS6_2_EXPOSED_PORT}:6379"
+        volumes:
+            # 挂载redis配置至容器
+            - ./volumes/redis/conf/redis.conf:/etc/redis.conf:rw
+            # 挂载redis数据库目录至容器
+            - ${REDIS6_2_DATA_PATH}:/data:rw
+            # 挂载redis日志目录至容器
+            - ${REDIS6_2_LOGS_PATH}:/logs:rw
+        # 覆盖容器启动的redis.conf
+        command: redis-server /etc/redis.conf
         restart: always
         # 网络
         networks:
@@ -74,7 +130,7 @@ services:
             - "fairs-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ~/data/webroot:/home/www:rw
+            - ${WEBROOT_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -102,7 +158,7 @@ services:
             - "fairs-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ~/data/webroot:/home/www:rw
+            - ${WEBROOT_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -130,7 +186,7 @@ services:
             - "fairs-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ~/data/webroot:/home/www:rw
+            - ${WEBROOT_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -158,7 +214,7 @@ services:
             - "pc-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ~/data/webroot:/home/www:rw
+            - ${WEBROOT_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -186,7 +242,7 @@ services:
             - "pc-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ~/data/webroot:/home/www:rw
+            - ${WEBROOT_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -214,63 +270,7 @@ services:
             - "pc-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ~/data/webroot:/home/www:rw
-        restart: always
-        # 网络
-        networks:
-            - default
-            - dev-network
-    # es6_8_12运行环境，也是网络名称
-    es6_8:
-        build:
-            # 从根目录下的elasticsearch-6.8.12文件夹下构建
-            context: ./services/elasticsearch-6.8.12
-            args:
-                TIMEZONE: ${TIMEZONE}
-                CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
-        # 容器名称
-        container_name: "es68"
-        cap_add:
-            - SYS_PTRACE
-        # 端口映射（不需要暴露端口）
-        ports:
-            - "9200:9200"
-        volumes:
-            # 挂载es配置至容器
-            - ./volumes/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:rw
-            # 挂载es数据库目录至容器
-            - ~/data/db/es/6.8.12/data:/usr/share/elasticsearch/data:rw
-            # 挂载es日志目录至容器
-            - ~/data/db/es/6.8.12/logs:/usr/share/elasticsearch/logs:rw
-        restart: always
-        # 网络
-        networks:
-            - default
-            - dev-network
-    # redis运行环境，也是网络名称
-    redis:
-        build:
-            # 从根目录下的redis文件夹下构建
-            context: ./services/redis
-            args:
-                TIMEZONE: ${TIMEZONE}
-                CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
-        # 容器名称
-        container_name: "redis"
-        cap_add:
-            - SYS_PTRACE
-        # 端口映射（不需要暴露端口）
-        ports:
-            - "6379:6379"
-        volumes:
-            # 挂载redis配置至容器
-            - ./volumes/redis/conf/redis.conf:/etc/redis.conf:rw
-            # 挂载redis数据库目录至容器
-            - ~/data/db/redis/6.2.4/data:/data:rw
-            # 挂载redis日志目录至容器
-            - ~/data/db/redis/6.2.4/logs:/logs:rw
-        # 覆盖容器启动的redis.conf
-        command: redis-server /etc/redis.conf
+            - ${WEBROOT_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -284,4 +284,4 @@ networks:
         ipam:
             config:
                 # 子网络
-                - subnet: 10.8.0.0/16
+                - subnet: ${NETWORK_SEGMENT}

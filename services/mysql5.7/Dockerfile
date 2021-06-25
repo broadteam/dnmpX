@@ -2,6 +2,7 @@ FROM daocloud.io/library/mysql:5.7.31
 
 MAINTAINER <Jueluo> "chaoyue@live.com"
 
+# 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
 ARG MYSQL_ROOT_PASSWORD=123456
 
 # 定义环境变量
