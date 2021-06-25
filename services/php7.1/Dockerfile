@@ -1,5 +1,5 @@
 # [构建第一阶段]
-FROM daocloud.io/library/php:7.4.10-fpm-alpine AS build_env
+FROM daocloud.io/library/php:7.1.5-fpm-alpine AS build_env
 
 # 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
 ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
@@ -69,7 +69,7 @@ RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcach
 RUN apk del autoconf g++ libtool make pcre-dev
 
 # [构建第二阶段]
-FROM daocloud.io/library/php:7.4.10-fpm-alpine
+FROM daocloud.io/library/php:7.1.5-fpm-alpine
 
 # 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
 ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn

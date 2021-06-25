@@ -1,5 +1,5 @@
 # [构建第一阶段]
-FROM daocloud.io/library/php:7.4.10-fpm-alpine AS build_env
+FROM daocloud.io/library/php:7.0.33-fpm-alpine AS build_env
 
 # 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
 ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
@@ -34,19 +34,19 @@ RUN docker-php-ext-install -j$(nproc) shmop soap
 RUN docker-php-ext-install -j$(nproc) sockets sysvmsg sysvsem sysvshm xsl zip
 
 # 编译redis扩展
-RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install redis-5.3.4.tgz && docker-php-ext-enable redis
 
 # 编译swoole扩展
-RUN pecl install swoole && docker-php-ext-enable swoole
+RUN pecl install swoole-2.1.0.tgz && docker-php-ext-enable swoole
 
 # 编译seaslog扩展
-RUN pecl install seaslog && docker-php-ext-enable seaslog
+RUN pecl install seaslog-2.2.0.tgz && docker-php-ext-enable seaslog
 
-# 编译yaf扩展
-RUN pecl install yaf  && docker-php-ext-enable yaf
+# 编译yaf扩展（指定版本）
+RUN pecl install yaf-3.0.4.tgz && docker-php-ext-enable yaf
 
-# 编译yar扩展
-RUN pecl install yar && docker-php-ext-enable yar
+# 编译yar扩展（指定版本）
+RUN pecl install yar-2.0.1.tgz && docker-php-ext-enable yar
 
 # 编译mcrypt扩展
 #RUN pecl install mcrypt-1.0.4.tgz && docker-php-ext-enable mcrypt
@@ -69,7 +69,7 @@ RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcach
 RUN apk del autoconf g++ libtool make pcre-dev
 
 # [构建第二阶段]
-FROM daocloud.io/library/php:7.4.10-fpm-alpine
+FROM daocloud.io/library/php:7.0.33-fpm-alpine
 
 # 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
 ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn

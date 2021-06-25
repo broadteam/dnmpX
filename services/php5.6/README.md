@@ -3,5 +3,5 @@
 切换到当前目录下，然后：
 
 ```
-docker build -t php:7.4-fpm ./
+docker build -t php:5.6-fpm ./
 ```

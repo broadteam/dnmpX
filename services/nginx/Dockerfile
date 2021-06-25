@@ -1,8 +1,9 @@
 FROM daocloud.io/library/nginx:1.19-alpine
 
-MAINTAINER <Jueluo chaoyue@live.com>
+MAINTAINER <Jueluo> "chaoyue@live.com"
 
-ARG CONTAINER_PACKAGE_URL
+# 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
+ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
 
 # 直接将站点的nginx配置复制到容器的nginx配置目录
 #COPY ./*.conf /etc/nginx/conf.d/
