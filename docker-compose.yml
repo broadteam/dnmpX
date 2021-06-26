@@ -33,10 +33,15 @@ services:
             context: ./services/mysql5.7
             args:
                 TIMEZONE: ${TIMEZONE}
-                MYSQL_ROOT_PASSWORD: ${MYSQL5_7_ROOT_PASSWORD}
+                MYSQL_ROOT_PASSWORD: ${MYSQL5_7_USER_PASSWORD}
         # 容器名称
         container_name: "mysql5_7"
         #image: mysql57:latest
+        #environment:
+        #  - MYSQL_ROOT_PASSWORD=${MYSQL5_7_USER_PASSWORD}
+        #  - MYSQL_USER=${MYSQL5_7_USER_NAME}
+        #  - MYSQL_PASSWORD=${MYSQL5_7_USER_PASSWORD}
+        #  - MYSQL_DATABASE=${MYSQL5_7_DATABASE}
         cap_add:
             - SYS_PTRACE
         # 端口映射（不需要暴露端口）
@@ -46,7 +51,7 @@ services:
             # 将mysql配置复制过去
             - ./volumes/mysql/5.7/my.cnf:/etc/my.cnf:rw
             # 将mysql数据库目录映射至容器
-            - ~/data/db/mysql/5.7/data:/var/lib/mysql:rw
+            - ${MYSQL5_7_DATA_PATH}:/var/lib/mysql:rw
         restart: always
         # 网络
         networks:
