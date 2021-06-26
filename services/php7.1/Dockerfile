@@ -1,5 +1,5 @@
 # [构建第一阶段]
-FROM daocloud.io/library/php:7.1.5-fpm-alpine AS build_env
+FROM daocloud.io/library/php:7.1.9-fpm-alpine AS build_env
 
 # 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
 ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
@@ -10,21 +10,22 @@ MAINTAINER <Jueluo> "chaoyue@live.com"
 RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi
 
 # 切换工作目录
-WORKDIR /usr/src
+WORKDIR /tmp
 
 # 拷贝soft下文件到当前工作目录
-ADD ./package/* ./
+COPY ./package/* ./
 
-# 安装telnet/vim/git工具
-RUN apk add --no-cache busybox-extras vim git
+# 安装telnet/vim/git工具（7.1已经安装过telnet了）
+#RUN apk update && apk add --no-cache busybox-extras vim git
+RUN apk add --no-cache vim git && pecl channel-update pecl.php.net
 
 # 安装编译工具（多个RUN可以分层编译，更容易排查错误）
-RUN apk add --no-cache autoconf file g++ gcc libtool libc-dev make pcre-dev
-RUN apk add --no-cache ca-certificates zlib-dev dpkg-dev dpkg pkgconf
+RUN apk add --no-cache autoconf g++ gcc libtool libc-dev make pcre-dev
+RUN apk add --no-cache ca-certificates zlib-dev dpkg-dev
 RUN apk add --no-cache --virtual .build-deps coreutils libedit-dev
 RUN apk add --no-cache linux-headers
-RUN apk add --no-cache krb5-dev openldap openldap-dev bzip2-dev curl-dev pcre-dev
-RUN apk add --no-cache libpng-dev libwebp-dev libjpeg libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
+RUN apk add --no-cache krb5-dev openldap-dev bzip2-dev curl-dev pcre-dev
+RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
 
 # 编译安装缺少的系统扩展
 RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar exif
@@ -34,19 +35,19 @@ RUN docker-php-ext-install -j$(nproc) shmop soap
 RUN docker-php-ext-install -j$(nproc) sockets sysvmsg sysvsem sysvshm xsl zip
 
 # 编译redis扩展
-RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install redis-5.3.4.tgz && docker-php-ext-enable redis
 
 # 编译swoole扩展
-RUN pecl install swoole && docker-php-ext-enable swoole
+RUN pecl install swoole-4.5.2.tgz && docker-php-ext-enable swoole
 
 # 编译seaslog扩展
-RUN pecl install seaslog && docker-php-ext-enable seaslog
+RUN pecl install seaslog-2.2.0.tgz && docker-php-ext-enable seaslog
 
 # 编译yaf扩展
-RUN pecl install yaf  && docker-php-ext-enable yaf
+RUN pecl install yaf-3.3.2.tgz  && docker-php-ext-enable yaf
 
 # 编译yar扩展
-RUN pecl install yar && docker-php-ext-enable yar
+RUN pecl install yar-2.0.1.tgz  && docker-php-ext-enable yar
 
 # 编译mcrypt扩展
 #RUN pecl install mcrypt-1.0.4.tgz && docker-php-ext-enable mcrypt
@@ -69,7 +70,7 @@ RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcach
 RUN apk del autoconf g++ libtool make pcre-dev
 
 # [构建第二阶段]
-FROM daocloud.io/library/php:7.1.5-fpm-alpine
+FROM daocloud.io/library/php:7.1.9-fpm-alpine
 
 # 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
 ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
@@ -97,7 +98,7 @@ COPY --from=build_env /usr/local/php /usr/local/php
 COPY --from=build_env /usr/local/lib/php /usr/local/lib/php
 COPY --from=build_env /usr/local/etc/php /usr/local/etc/php
 COPY --from=build_env /usr/local/include/php /usr/local/include/php
-COPY --from=build_env /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+#COPY --from=build_env /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 
 # 从第一阶段复制vim到当前容器
 COPY --from=build_env /usr/bin/vim /usr/bin/vim
@@ -109,8 +110,8 @@ COPY --from=build_env /usr/bin/git /usr/bin/git
 COPY --from=build_env /usr/libexec/git-core /usr/libexec/git-core
 COPY --from=build_env /var/git /var/git
 
-# 从第一阶段复制busybox、telnet到当前容器
-COPY --from=build_env /bin/busybox /bin/busybox
-COPY --from=build_env /usr/bin/telnet /usr/bin/telnet
+# 从第一阶段复制busybox、telnet到当前容器（7.1已经安装过telnet了）
+#COPY --from=build_env /bin/busybox /bin/busybox
+#COPY --from=build_env /usr/bin/telnet /usr/bin/telnet
 
 WORKDIR /home/www

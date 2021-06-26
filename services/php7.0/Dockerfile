@@ -10,21 +10,21 @@ MAINTAINER <Jueluo> "chaoyue@live.com"
 RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi
 
 # 切换工作目录
-WORKDIR /usr/src
+WORKDIR /tmp
 
 # 拷贝soft下文件到当前工作目录
-ADD ./package/* ./
+COPY ./package/* ./
 
 # 安装telnet/vim/git工具
 RUN apk add --no-cache busybox-extras vim git
 
 # 安装编译工具（多个RUN可以分层编译，更容易排查错误）
-RUN apk add --no-cache autoconf file g++ gcc libtool libc-dev make pcre-dev
-RUN apk add --no-cache ca-certificates zlib-dev dpkg-dev dpkg pkgconf
+RUN apk add --no-cache autoconf g++ gcc libtool libc-dev make pcre-dev
+RUN apk add --no-cache ca-certificates zlib-dev dpkg-dev
 RUN apk add --no-cache --virtual .build-deps coreutils libedit-dev
 RUN apk add --no-cache linux-headers
-RUN apk add --no-cache krb5-dev openldap openldap-dev bzip2-dev curl-dev pcre-dev
-RUN apk add --no-cache libpng-dev libwebp-dev libjpeg libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
+RUN apk add --no-cache krb5-dev openldap-dev bzip2-dev curl-dev pcre-dev
+RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev libxslt-dev
 
 # 编译安装缺少的系统扩展
 RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar exif
