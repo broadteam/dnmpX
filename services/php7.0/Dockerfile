@@ -24,7 +24,7 @@ RUN apk add --no-cache ca-certificates zlib-dev dpkg-dev
 RUN apk add --no-cache --virtual .build-deps coreutils libedit-dev
 RUN apk add --no-cache linux-headers
 RUN apk add --no-cache krb5-dev openldap-dev bzip2-dev curl-dev pcre-dev
-RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev libxslt-dev
+RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
 
 # 编译安装缺少的系统扩展
 RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar exif
