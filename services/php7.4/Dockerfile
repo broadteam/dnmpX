@@ -15,8 +15,8 @@ WORKDIR /tmp
 # 拷贝soft下文件到当前工作目录
 COPY ./package/* ./
 
-# 安装telnet/vim/git工具
-RUN apk add --no-cache busybox-extras vim git
+# 安装telnet、vim、git、tzdata工具
+RUN apk add --update --no-cache busybox-extras vim git tzdata
 
 # 安装编译工具（多个RUN可以分层编译，更容易排查错误）
 RUN apk add --no-cache autoconf g++ gcc libtool libc-dev make pcre-dev
@@ -25,6 +25,7 @@ RUN apk add --no-cache --virtual .build-deps coreutils libedit-dev
 RUN apk add --no-cache linux-headers
 RUN apk add --no-cache krb5-dev openldap-dev bzip2-dev curl-dev pcre-dev
 RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
+#RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo libjpeg-turbo-utils libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
 
 # 编译安装缺少的系统扩展
 RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar exif

@@ -15,9 +15,9 @@ WORKDIR /tmp
 # 拷贝soft下文件到当前工作目录
 COPY ./package/* ./
 
-# 安装telnet/vim/git工具（7.1已经安装过telnet了）
+# 安装telnet、vim、git、tzdata工具（7.1已经安装过telnet了）
 #RUN apk update && apk add --no-cache busybox-extras vim git
-RUN apk add --no-cache vim git && pecl channel-update pecl.php.net
+RUN apk add --update --no-cache vim git && pecl channel-update pecl.php.net
 
 # 安装编译工具（多个RUN可以分层编译，更容易排查错误）
 RUN apk add --no-cache autoconf g++ gcc libtool libc-dev make pcre-dev
