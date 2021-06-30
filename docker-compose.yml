@@ -7,10 +7,10 @@ services:
             # 从根目录下的nginx文件夹下构建
             context: ./services/nginx
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         # 容器名称
-        container_name: "nginx1_19"
+        container_name: "${NGINX1_19_CONTAINER_NAME}"
         ports:
             - "${NGINX1_19_EXPOSED_PORT}:80"
         links:
@@ -21,7 +21,8 @@ services:
             # 挂载web项目目录至容器
             - ${WEBROOT_ROOT_PATH}:/home/www:rw
         environment:
-            TZ: "$TIMEZONE"
+            TIME_ZONE: "$TIMEZONE"
+        privileged: true
         restart: always
         networks:
             - default
@@ -32,10 +33,10 @@ services:
             # 从根目录下的mysql57文件夹下构建
             context: ./services/mysql5.7
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 MYSQL_ROOT_PASSWORD: ${MYSQL5_7_USER_PASSWORD}
         # 容器名称
-        container_name: "mysql5_7"
+        container_name: "${MYSQL5_7_CONTAINER_NAME}"
         #image: mysql57:latest
         #environment:
         #  - MYSQL_ROOT_PASSWORD=${MYSQL5_7_USER_PASSWORD}
@@ -63,10 +64,10 @@ services:
             # 从根目录下的elasticsearch-6.8.12文件夹下构建
             context: ./services/elasticsearch-6.8.12
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         # 容器名称
-        container_name: "elasticsearch6_8"
+        container_name: "${ES6_8_CONTAINER_NAME}"
         cap_add:
             - SYS_PTRACE
         # 端口映射（不需要暴露端口）
@@ -90,10 +91,10 @@ services:
             # 从根目录下的redis文件夹下构建
             context: ./services/redis
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         # 容器名称
-        container_name: "redis6_2"
+        container_name: "${REDIS6_2_CONTAINER_NAME}"
         cap_add:
             - SYS_PTRACE
         # 端口映射（不需要暴露端口）
@@ -119,11 +120,11 @@ services:
             context: ./services/php5.6
             # 环境变量传入
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
                 COMPOSER_MIRRORS_URL: ${COMPOSER_MIRRORS_URL}
         # 容器名称
-        container_name: "php5_6"
+        container_name: "${PHP5_6_FPM_CONTAINER_NAME}"
         # 容器的权限设置（privileged/cap-add/cap-drop）
         cap_add:
             - SYS_PTRACE
@@ -147,11 +148,11 @@ services:
             context: ./services/php7.0
             # 环境变量传入
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
                 COMPOSER_MIRRORS_URL: ${COMPOSER_MIRRORS_URL}
         # 容器名称
-        container_name: "php7_0"
+        container_name: "${PHP7_0_FPM_CONTAINER_NAME}"
         # 容器的权限设置（privileged/cap-add/cap-drop）
         cap_add:
             - SYS_PTRACE
@@ -175,11 +176,11 @@ services:
             context: ./services/php7.1
             # 环境变量传入
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
                 COMPOSER_MIRRORS_URL: ${COMPOSER_MIRRORS_URL}
         # 容器名称
-        container_name: "php7_1"
+        container_name: "${PHP7_1_FPM_CONTAINER_NAME}"
         # 容器的权限设置（privileged/cap-add/cap-drop）
         cap_add:
             - SYS_PTRACE
@@ -203,11 +204,11 @@ services:
             context: ./services/php7.2
             # 环境变量传入
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
                 COMPOSER_MIRRORS_URL: ${COMPOSER_MIRRORS_URL}
         # 容器名称
-        container_name: "php7_2"
+        container_name: "${PHP7_2_FPM_CONTAINER_NAME}"
         # 容器的权限设置（privileged/cap-add/cap-drop）
         cap_add:
             - SYS_PTRACE
@@ -231,11 +232,11 @@ services:
             context: ./services/php7.3
             # 环境变量传入
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
                 COMPOSER_MIRRORS_URL: ${COMPOSER_MIRRORS_URL}
         # 容器名称
-        container_name: "php7_3"
+        container_name: "${PHP7_3_FPM_CONTAINER_NAME}"
         # 容器的权限设置（privileged/cap-add/cap-drop）
         cap_add:
             - SYS_PTRACE
@@ -259,11 +260,11 @@ services:
             context: ./services/php7.4
             # 环境变量传入
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
                 COMPOSER_MIRRORS_URL: ${COMPOSER_MIRRORS_URL}
         # 容器名称
-        container_name: "php7_4"
+        container_name: "${PHP7_4_FPM_CONTAINER_NAME}"
         # 容器的权限设置（privileged/cap-add/cap-drop）
         cap_add:
             - SYS_PTRACE
