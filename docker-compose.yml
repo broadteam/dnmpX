@@ -19,7 +19,7 @@ services:
             # 挂载nginx配置至容器
             - ./volumes/nginx/conf.d:/etc/nginx/conf.d:rw
             # 挂载web项目目录至容器
-            - ${WEBROOT_ROOT_PATH}:/home/www:rw
+            - ${WEB_ROOT_PATH}:/home/www:rw
         environment:
             TIME_ZONE: "$TIMEZONE"
         privileged: true
@@ -136,7 +136,7 @@ services:
             - "fairs-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ${WEBROOT_ROOT_PATH}:/home/www:rw
+            - ${WEB_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -164,7 +164,7 @@ services:
             - "fairs-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ${WEBROOT_ROOT_PATH}:/home/www:rw
+            - ${WEB_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -192,7 +192,7 @@ services:
             - "fairs-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ${WEBROOT_ROOT_PATH}:/home/www:rw
+            - ${WEB_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -220,7 +220,7 @@ services:
             - "pc-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ${WEBROOT_ROOT_PATH}:/home/www:rw
+            - ${WEB_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -248,7 +248,7 @@ services:
             - "pc-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ${WEBROOT_ROOT_PATH}:/home/www:rw
+            - ${WEB_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
@@ -276,7 +276,7 @@ services:
             - "pc-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
-            - ${WEBROOT_ROOT_PATH}:/home/www:rw
+            - ${WEB_ROOT_PATH}:/home/www:rw
         restart: always
         # 网络
         networks:
