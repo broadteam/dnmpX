@@ -141,4 +141,7 @@ COPY --from=build_env /usr/bin/posixtz /usr/bin/posixtz
 COPY --from=build_env /bin/busybox /bin/busybox
 COPY --from=build_env /usr/bin/telnet /usr/bin/telnet
 
+# 从其它镜像复制php-extension-installer到当前容器
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
+
 WORKDIR /home/www
