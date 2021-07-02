@@ -20,6 +20,8 @@ services:
             - ./volumes/nginx/conf.d:/etc/nginx/conf.d:rw
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            # 挂载web配置目录至容器
+            - ${WEB_CONFIG_PATH}:/home/www/data:rw
         environment:
             TIME_ZONE: "$TIMEZONE"
         privileged: true
@@ -137,6 +139,8 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            # 挂载web配置目录至容器
+            - ${WEB_CONFIG_PATH}:/home/www/data:rw
         restart: always
         # 网络
         networks:
@@ -165,6 +169,8 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            # 挂载web配置目录至容器
+            - ${WEB_CONFIG_PATH}:/home/www/data:rw
         restart: always
         # 网络
         networks:
@@ -193,6 +199,8 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            # 挂载web配置目录至容器
+            - ${WEB_CONFIG_PATH}:/home/www/data:rw
         restart: always
         # 网络
         networks:
@@ -221,6 +229,8 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            # 挂载web配置目录至容器
+            - ${WEB_CONFIG_PATH}:/home/www/data:rw
         restart: always
         # 网络
         networks:
@@ -249,6 +259,8 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            # 挂载web配置目录至容器
+            - ${WEB_CONFIG_PATH}:/home/www/data:rw
         restart: always
         # 网络
         networks:
@@ -277,6 +289,8 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            # 挂载web配置目录至容器
+            - ${WEB_CONFIG_PATH}:/home/www/data:rw
         restart: always
         # 网络
         networks:
