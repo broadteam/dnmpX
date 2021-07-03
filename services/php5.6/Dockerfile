@@ -15,8 +15,12 @@ RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONT
 # 切换工作目录
 WORKDIR /tmp
 
-# 拷贝soft下文件到当前工作目录
+# 拷贝package下文件到当前工作目录
 COPY ./package/* ./
+
+# 拷贝package下install-php-extension文件到/usr/bin
+COPY ./package/install-php-extension /usr/bin/
+RUN chmod +x /usr/bin/install-php-extension
 
 # 安装telnet、vim、git、tzdata工具
 RUN apk add --update --no-cache vim git tzdata && pecl channel-update pecl.php.net
@@ -73,7 +77,8 @@ RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcach
 && chmod -R +x /usr/local/lib/php/extensions/no-debug-non-zts-*/
 
 # 删除依赖
-RUN apk del autoconf g++ libtool make pcre-dev
+RUN apk del -f .build-deps autoconf g++ make libtool pcre-dev
+#RUN apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 # [构建第二阶段]
 FROM daocloud.io/library/php:5.6.31-fpm-alpine
@@ -131,5 +136,8 @@ COPY --from=build_env /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=build_env /usr/sbin/zic /usr/sbin/zic
 COPY --from=build_env /usr/sbin/zdump /usr/sbin/zdump
 COPY --from=build_env /usr/bin/posixtz /usr/bin/posixtz
+
+# 从第一阶段复制install-php-extension到当前容器
+COPY --from=build_env /usr/bin/install-php-extension /usr/bin/install-php-extension
 
 WORKDIR /home/www

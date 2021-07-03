@@ -14,7 +14,7 @@ RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONT
 # 切换工作目录
 #WORKDIR /tmp
 
-# 拷贝soft下文件到当前工作目录
+# 拷贝package下文件到当前工作目录
 #COPY ./package/* ./
 
 # 安装开发工具包alpine-sdk

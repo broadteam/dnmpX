@@ -15,8 +15,12 @@ RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONT
 # 切换工作目录
 WORKDIR /tmp
 
-# 拷贝soft下文件到当前工作目录
+# 拷贝package下文件到当前工作目录
 COPY ./package/* ./
+
+# 拷贝package下install-php-extension文件到/usr/bin
+COPY ./package/install-php-extension /usr/bin/
+RUN chmod +x /usr/bin/install-php-extension
 
 # 安装telnet、vim、git、tzdata工具
 RUN apk add --update --no-cache busybox-extras vim git tzdata && pecl channel-update pecl.php.net
@@ -32,7 +36,7 @@ RUN apk add --no-cache --virtual .build-deps coreutils libedit-dev
 RUN apk add --no-cache linux-headers
 RUN apk add --no-cache krb5-dev openldap-dev bzip2-dev curl-dev pcre-dev
 RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
-RUN apk add --no-cache librdkafka-dev
+RUN apk add --no-cache librdkafka-dev rabbitmq-c rabbitmq-c-dev
 
 # 编译安装缺少的系统扩展
 RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar exif
@@ -59,14 +63,18 @@ RUN pecl install yar-2.0.1.tgz && docker-php-ext-enable yar
 # 编译rdkafka扩展
 RUN pecl install rdkafka-5.0.0.tgz && docker-php-ext-enable rdkafka
 
+# 编译amqp扩展
+RUN pecl install amqp-1.10.2.tgz && docker-php-ext-enable amqp
+
 # 编译mcrypt扩展
 #RUN pecl install mcrypt-1.0.4.tgz && docker-php-ext-enable mcrypt
 
 # 安装imagick、memcached扩展依赖
 #RUN apk add --no-cache imagemagick-dev libmemcached-dev
+RUN apk add --no-cache imagemagick-dev
 
 # 编译imagick扩展
-#RUN pecl install imagick-3.4.4.tgz && docker-php-ext-enable imagick
+RUN pecl install imagick-3.4.4.tgz && docker-php-ext-enable imagick
 
 # 编译memcached扩展
 #RUN pecl install memcached-3.1.5.tgz && docker-php-ext-enable memcached
@@ -77,7 +85,8 @@ RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcach
 && chmod -R +x /usr/local/lib/php/extensions/no-debug-non-zts-*/
 
 # 删除依赖
-RUN apk del autoconf g++ libtool make pcre-dev
+RUN apk del -f .build-deps autoconf g++ make libtool pcre-dev
+#RUN apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 # [构建第二阶段]
 FROM daocloud.io/library/php:7.0.33-fpm-alpine
@@ -142,6 +151,24 @@ COPY --from=build_env /bin/busybox /bin/busybox
 COPY --from=build_env /usr/bin/telnet /usr/bin/telnet
 
 # 从其它镜像复制php-extension-installer到当前容器
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
+#COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
+
+# 从第一阶段复制install-php-extension到当前容器
+COPY --from=build_env /usr/bin/install-php-extension /usr/bin/install-php-extension
+
+# 从第一阶段复制imagick extension到当前容器
+COPY --from=build_env /etc/fonts /etc/fonts
+COPY --from=build_env /usr/bin/MagickWand-config /usr/bin/MagickWand-config
+COPY --from=build_env /usr/bin/fc-match /usr/bin/fc-match
+COPY --from=build_env /usr/bin/fc-validate /usr/bin/fc-validate
+COPY --from=build_env /usr/bin/Magick++-config /usr/bin/Magick++-config
+COPY --from=build_env /usr/bin/fc-cache /usr/bin/fc-cache
+COPY --from=build_env /usr/bin/fc-query /usr/bin/fc-query
+COPY --from=build_env /usr/bin/fc-cat /usr/bin/fc-cat
+#COPY --from=build_env /usr/bin/fc-conflist /usr/bin/fc-conflist
+COPY --from=build_env /usr/bin/MagickCore-config /usr/bin/MagickCore-config
+COPY --from=build_env /usr/bin/fc-list /usr/bin/fc-list
+COPY --from=build_env /usr/bin/fc-pattern /usr/bin/fc-pattern
+COPY --from=build_env /usr/bin/fc-scan /usr/bin/fc-scan
 
 WORKDIR /home/www
