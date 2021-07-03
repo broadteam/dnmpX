@@ -86,7 +86,7 @@ RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcach
 && chmod -R +x /usr/local/lib/php/extensions/no-debug-non-zts-*/
 
 # 删除依赖
-#RUN apk del -f .build-deps autoconf g++ make libtool pcre-dev
+RUN apk del -f .build-deps autoconf g++ make libtool pcre-dev
 #RUN apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 # [构建第二阶段]
