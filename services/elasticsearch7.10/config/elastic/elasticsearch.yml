@@ -9,8 +9,4 @@ node.master: true
 node.ingest: true
 node.data: true
 
-# 数据路径
-path.data: /usr/local/elasticsearch/data
-
-# 日志路径
-path.logs: /usr/local/elasticsearch/logs
+discovery.type: "single-node"

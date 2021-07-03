@@ -63,8 +63,8 @@ services:
     # es6_8_12运行环境，也是网络名称
     elasticsearch6_8:
         build:
-            # 从根目录下的elasticsearch-6.8.12文件夹下构建
-            context: ./services/elasticsearch-6.8.12
+            # 从根目录下的elasticsearch6.8文件夹下构建
+            context: ./services/elasticsearch6.8
             args:
                 TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
@@ -77,11 +77,11 @@ services:
             - "${ES6_8_EXPOSED_PORT}:9200"
         volumes:
             # 挂载es配置至容器
-            - ./volumes/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:rw
+            - ./volumes/elasticsearch/config/elasticsearch.yml:/usr/local/elasticsearch/config/elasticsearch.yml:rw
             # 挂载es数据库目录至容器
-            - ${ES6_8_DATA_PATH}:/usr/share/elasticsearch/data:rw
+            - ${ES6_8_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器
-            - ${ES6_8_LOGS_PATH}:/usr/share/elasticsearch/logs:rw
+            - ${ES6_8_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
         restart: always
         # 网络
         networks:
