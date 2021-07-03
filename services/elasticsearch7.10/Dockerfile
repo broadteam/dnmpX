@@ -1,53 +1,76 @@
-FROM alpine:3.13
+FROM daocloud.io/library/alpine:3.12
 
-LABEL maintainer "https://github.com/blacktop"
+# 只对当前FROM中管用（如果存在.env就用.env中的，否则就用当前）
+ARG CONTAINER_PACKAGE_URL=mirrors.ustc.edu.cn
+
+# 时区设置
+ARG TIME_ZONE=Asia/Shanghai
+
+MAINTAINER <Jueluo> "chaoyue@live.com"
+
+# 更新为国内镜像
+RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONTAINER_PACKAGE_URL}/g" /etc/apk/repositories ; fi
+
+# 拷贝package下文件到当前工作目录
+#COPY ./package/* /tmp
 
 RUN apk add --no-cache openjdk11-jre-headless su-exec
 
-ENV VERSION 7.10.2
-ENV DOWNLOAD_URL "https://artifacts.elastic.co/downloads/elasticsearch"
-ENV ES_TARBAL "${DOWNLOAD_URL}/elasticsearch-oss-${VERSION}-no-jdk-linux-x86_64.tar.gz"
-ENV ES_TARBALL_ASC "${DOWNLOAD_URL}/elasticsearch-oss-${VERSION}-no-jdk-linux-x86_64.tar.gz.asc"
-ENV EXPECTED_SHA_URL "${DOWNLOAD_URL}/elasticsearch-oss-${VERSION}-no-jdk-linux-x86_64.tar.gz.sha512"
-ENV ES_TARBALL_SHA "7b63237996569ccdc7c9d9e7cc097fcb23865396eddac30e5f02543484220d2fc70a7285b430877e5e76a5d8716d9682de9fc40d5e57a08f331e82011fc59756"
-ENV GPG_KEY "46095ACC8548582C1A2699A9D27D666CD88E42B4"
+# 必须指定版本和插件一致
+ENV VERSION 7.10.1
 
-RUN apk add --no-cache bash
-RUN apk add --no-cache -t .build-deps wget ca-certificates gnupg openssl \
-  && set -ex \
-  && cd /tmp \
-  && echo "===> Install Elasticsearch..." \
-  && wget --progress=bar:force -O elasticsearch.tar.gz "$ES_TARBAL"; \
-  if [ "$ES_TARBALL_SHA" ]; then \
-  echo "$ES_TARBALL_SHA *elasticsearch.tar.gz" | sha512sum -c -; \
-  fi; \
-  if [ "$ES_TARBALL_ASC" ]; then \
-  wget --progress=bar:force -O elasticsearch.tar.gz.asc "$ES_TARBALL_ASC"; \
-  export GNUPGHOME="$(mktemp -d)"; \
-  ( gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEY" \
-  || gpg --keyserver pgp.mit.edu --recv-keys "$GPG_KEY" \
-  || gpg --keyserver keyserver.pgp.com --recv-keys "$GPG_KEY" ); \
-  gpg --batch --verify elasticsearch.tar.gz.asc elasticsearch.tar.gz; \
-  rm -rf "$GNUPGHOME" elasticsearch.tar.gz.asc || true; \
-  fi; \
-  tar -xf elasticsearch.tar.gz \
-  && ls -lah \
-  && mv elasticsearch-$VERSION /usr/local/elasticsearch \
-  && adduser -D -h /usr/local/elasticsearch elasticsearch \
-  && echo "===> Creating Elasticsearch Paths..." \
-  && for path in \
-  /usr/local/elasticsearch/data \
-  /usr/local/elasticsearch/logs \
-  /usr/local/elasticsearch/config \
-  /usr/local/elasticsearch/config/scripts \
-  /usr/local/elasticsearch/tmp \
-  /usr/local/elasticsearch/plugins \
-  ; do \
-  mkdir -p "$path"; \
-  chown -R elasticsearch:elasticsearch "$path"; \
-  done \
-  && rm -rf /tmp/* /usr/local/elasticsearch/jdk \
-  && apk del --purge .build-deps
+# https://mirrors.huaweicloud.com/elasticsearch
+# oss版本可以在alpine中运行
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-7.10.1-no-jdk-linux-x86_64.tar.gz
+
+# es下载源地址（默认的官网太慢）
+ENV DOWNLOAD_URL "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-${VERSION}-no-jdk-linux-x86_64.tar.gz"
+
+# 插件源地址（默认的github太慢）
+ENV PLUGIN_MIRROR "https://github.rc1844.workers.dev"
+
+RUN apk add --no-cache bash \
+    && apk add --no-cache -t .build-deps wget ca-certificates openssl \
+    # 安装vim、tzdata工具
+    #&& apk add --no-cache vim tzdata \
+    # 设置时区
+    #&& echo "${TIME_ZONE}" > /etc/timezone \
+    #&& ln -sf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
+    && set -ex \
+    && cd /tmp \
+    && echo "===> Install Elasticsearch..." \
+    && wget --progress=bar:force -O elasticsearch.tar.gz "$DOWNLOAD_URL" && tar -xf elasticsearch.tar.gz \
+    && ls -lah \
+    && mv elasticsearch-$VERSION /usr/local/elasticsearch \
+    && adduser -D -h /usr/local/elasticsearch elasticsearch \
+    && echo "===> Creating Elasticsearch Paths..." \
+    && for path in \
+        /usr/local/elasticsearch/data \
+        /usr/local/elasticsearch/logs \
+        /usr/local/elasticsearch/config \
+        /usr/local/elasticsearch/config/scripts \
+        /usr/local/elasticsearch/tmp \
+        /usr/local/elasticsearch/plugins \
+    ; do \
+    mkdir -p "$path"; \
+    chown -R elasticsearch:elasticsearch "$path"; \
+    done \
+    # 安装ik插件
+    && wget --progress=bar:force -O elasticsearch-analysis-ik.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-ik/releases/download/v${VERSION}/elasticsearch-analysis-ik-${VERSION}.zip \
+    && mkdir -p /usr/local/elasticsearch/plugins/analysis-ik \
+    && unzip elasticsearch-analysis-ik.zip -d /usr/local/elasticsearch/plugins/analysis-ik \
+    # 安装pinyin插件
+    && wget --progress=bar:force -O elasticsearch-analysis-pinyin.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-pinyin/releases/download/v${VERSION}/elasticsearch-analysis-pinyin-${VERSION}.zip \
+    && mkdir -p /usr/local/elasticsearch/plugins/analysis-pinyin \
+    && unzip elasticsearch-analysis-pinyin.zip -d /usr/local/elasticsearch/plugins/analysis-pinyin \
+    # 安装腾讯云cos插件
+    && wget --progress=bar:force -O repository-cos.zip ${PLUGIN_MIRROR}/tencentyun/elasticsearch-repository-cos/releases/download/v${VERSION}/repository-cos-${VERSION}.zip \
+    && mkdir -p /usr/local/elasticsearch/plugins/repository-cos \
+    && unzip repository-cos.zip -d /usr/local/elasticsearch/plugins/repository-cos \
+    # 清除缓存（es7+自带了jdk，在docker里删除掉防止占用空间大）
+    && rm -rf /tmp/* /usr/local/elasticsearch/jdk \
+    && rm -rf /var/cache/apk* \
+    && apk del --purge .build-deps
 
 # TODO: remove this (it removes X-Pack ML so it works on Alpine)
 RUN rm -rf /usr/local/elasticsearch/modules/x-pack-ml/platform/linux-x86_64
@@ -62,6 +85,12 @@ WORKDIR /usr/local/elasticsearch
 
 ENV PATH /usr/local/elasticsearch/bin:$PATH
 ENV ES_TMPDIR /usr/local/elasticsearch/tmp
+
+# 设置JAVA_HOME环境变量
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk/jre
+
+# 直接将以前编译好的文件复制到扩展目录
+#COPY ./plugins /usr/local/elasticsearch/plugins
 
 VOLUME ["/usr/local/elasticsearch/data"]
 

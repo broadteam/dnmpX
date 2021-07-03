@@ -60,8 +60,8 @@ services:
         networks:
             - default
             - dev-network
-    # es6_8_12运行环境，也是网络名称
-    elasticsearch6_8:
+    # es6_8运行环境，也是网络名称
+    es6_8:
         build:
             # 从根目录下的elasticsearch6.8文件夹下构建
             context: ./services/elasticsearch6.8
@@ -82,6 +82,33 @@ services:
             - ${ES6_8_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器
             - ${ES6_8_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
+        restart: always
+        # 网络
+        networks:
+            - default
+            - dev-network
+    # es7_10运行环境，也是网络名称
+    es7_10:
+        build:
+            # 从根目录下的elasticsearch7.10文件夹下构建
+            context: ./services/elasticsearch7.10
+            args:
+                TIME_ZONE: ${TIME_ZONE}
+                CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        # 容器名称
+        container_name: "${ES7_10_CONTAINER_NAME}"
+        cap_add:
+            - SYS_PTRACE
+        # 端口映射（不需要暴露端口）
+        ports:
+            - "${ES7_10_EXPOSED_PORT}:9200"
+        volumes:
+            # 挂载es配置至容器
+            - ./volumes/elasticsearch/config/elasticsearch.yml:/usr/local/elasticsearch/config/elasticsearch.yml:rw
+            # 挂载es数据库目录至容器
+            - ${ES7_10_DATA_PATH}:/usr/local/elasticsearch/data:rw
+            # 挂载es日志目录至容器
+            - ${ES7_10_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
         restart: always
         # 网络
         networks:
