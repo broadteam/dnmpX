@@ -77,7 +77,9 @@ services:
             - "${ES6_8_EXPOSED_PORT}:9200"
         volumes:
             # 挂载es配置至容器
-            - ./volumes/elasticsearch/config/elasticsearch.yml:/usr/local/elasticsearch/config/elasticsearch.yml:rw
+            - ./volumes/elasticsearch/6.8/config/elasticsearch.yml:/usr/local/elasticsearch/config/elasticsearch.yml:rw
+            - ./volumes/elasticsearch/6.8/config/log4j2.properties:/usr/local/elasticsearch/config/log4j2.properties:rw
+            - ./volumes/elasticsearch/6.8/config/jvm.options:/usr/local/elasticsearch/config/jvm.options:rw
             # 挂载es数据库目录至容器
             - ${ES6_8_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器
@@ -104,7 +106,9 @@ services:
             - "${ES7_10_EXPOSED_PORT}:9200"
         volumes:
             # 挂载es配置至容器
-            - ./volumes/elasticsearch/config/elasticsearch.yml:/usr/local/elasticsearch/config/elasticsearch.yml:rw
+            - ./volumes/elasticsearch/7.10/config/elasticsearch.yml:/usr/local/elasticsearch/config/elasticsearch.yml:rw
+            - ./volumes/elasticsearch/7.10/config/log4j2.properties:/usr/local/elasticsearch/config/log4j2.properties:rw
+            - ./volumes/elasticsearch/7.10/config/jvm.options:/usr/local/elasticsearch/config/jvm.options:rw
             # 挂载es数据库目录至容器
             - ${ES7_10_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器

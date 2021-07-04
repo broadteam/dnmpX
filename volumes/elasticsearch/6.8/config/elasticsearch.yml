@@ -14,3 +14,5 @@ path.data: /usr/local/elasticsearch/data
 
 # 日志路径
 path.logs: /usr/local/elasticsearch/logs
+
+discovery.type: "single-node"

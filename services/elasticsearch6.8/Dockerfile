@@ -75,7 +75,7 @@ RUN apk add --no-cache bash \
 COPY config/elastic /usr/local/elasticsearch/config
 COPY config/logrotate /etc/logrotate.d/elasticsearch
 COPY elastic-entrypoint.sh /
-RUN chmod +x /elastic-entrypoint.sh
+RUN chmod +x /elastic-entrypoint.sh && chown elasticsearch:elasticsearch /usr/local/elasticsearch/config
 COPY docker-healthcheck /usr/local/bin/
 
 WORKDIR /usr/local/elasticsearch
@@ -85,9 +85,6 @@ ENV ES_TMPDIR /usr/local/elasticsearch/tmp
 
 # 设置JAVA_HOME环境变量
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk/jre
-
-# 直接将以前编译好的文件复制到扩展目录
-#COPY ./plugins /usr/local/elasticsearch/plugins
 
 VOLUME ["/usr/local/elasticsearch/data"]
 
