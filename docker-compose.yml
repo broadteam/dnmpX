@@ -5,7 +5,7 @@ services:
     nginx1_19:
         build:
             # 从根目录下的nginx文件夹下构建
-            context: ./services/nginx
+            context: ./services/nginx/1.19
             args:
                 TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
@@ -33,7 +33,7 @@ services:
     mysql5_7:
         build:
             # 从根目录下的mysql57文件夹下构建
-            context: ./services/mysql5.7
+            context: ./services/mysql/5.7
             args:
                 TIME_ZONE: ${TIME_ZONE}
                 MYSQL_ROOT_PASSWORD: ${MYSQL5_7_USER_PASSWORD}
@@ -64,7 +64,7 @@ services:
     es5_6:
         build:
             # 从根目录下的elasticsearch5.6文件夹下构建
-            context: ./services/elasticsearch5.6
+            context: ./services/elasticsearch/5.6
             args:
                 TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
@@ -106,7 +106,7 @@ services:
     es6_8:
         build:
             # 从根目录下的elasticsearch6.8文件夹下构建
-            context: ./services/elasticsearch6.8
+            context: ./services/elasticsearch/6.8
             args:
                 TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
@@ -148,7 +148,7 @@ services:
     es7_10:
         build:
             # 从根目录下的elasticsearch7.10文件夹下构建
-            context: ./services/elasticsearch7.10
+            context: ./services/elasticsearch/7.10
             args:
                 TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
@@ -190,7 +190,7 @@ services:
     redis6_2:
         build:
             # 从根目录下的redis文件夹下构建
-            context: ./services/redis
+            context: ./services/redis/6.2
             args:
                 TIME_ZONE: ${TIME_ZONE}
                 CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
@@ -218,7 +218,7 @@ services:
     # php5.6-fpm运行环境，也是网络名称
     php5_6:
         build:
-            context: ./services/php5.6
+            context: ./services/php/5.6
             # 环境变量传入
             args:
                 TIME_ZONE: ${TIME_ZONE}
@@ -248,7 +248,7 @@ services:
     # php7.0-fpm运行环境，也是网络名称
     php7_0:
         build:
-            context: ./services/php7.0
+            context: ./services/php/7.0
             # 环境变量传入
             args:
                 TIME_ZONE: ${TIME_ZONE}
@@ -278,7 +278,7 @@ services:
     # php7.1-fpm运行环境，也是网络名称
     php7_1:
         build:
-            context: ./services/php7.1
+            context: ./services/php/7.1
             # 环境变量传入
             args:
                 TIME_ZONE: ${TIME_ZONE}
@@ -308,7 +308,7 @@ services:
     # php7.2-fpm运行环境，也是网络名称
     php7_2:
         build:
-            context: ./services/php7.2
+            context: ./services/php/7.2
             # 环境变量传入
             args:
                 TIME_ZONE: ${TIME_ZONE}
@@ -338,7 +338,7 @@ services:
     # php7.3-fpm运行环境，也是网络名称
     php7_3:
         build:
-            context: ./services/php7.3
+            context: ./services/php/7.3
             # 环境变量传入
             args:
                 TIME_ZONE: ${TIME_ZONE}
@@ -368,7 +368,7 @@ services:
     # php7.4-fpm运行环境，也是网络名称
     php7_4:
         build:
-            context: ./services/php7.4
+            context: ./services/php/7.4
             # 环境变量传入
             args:
                 TIME_ZONE: ${TIME_ZONE}
