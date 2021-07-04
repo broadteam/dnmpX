@@ -20,7 +20,8 @@ docker-compose up -d               # 创建并且后台运行方式启动所有�
 docker-compose up nginx php7_3     # 创建并且启动nginx、php7.3、mysql的多个容器
 docker-compose up -d nginx php7_4  # 创建并且已后台运行的方式启动nginx、php7.3、mysql容器
 
-docker-compose up -d nginx1_19 mysql5_7 php7_4 php7_0 redis6_2 es6_8 es7_10
+docker-compose up -d nginx1_19 mysql5_7 php7_4 php7_0 redis6_2 es6_8
+docker-compose up -d --build es5_6 es6_8 es7_10
 
 docker-compose start php73         # 启动服务
 docker-compose stop php73          # 停止服务

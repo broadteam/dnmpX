@@ -60,6 +60,35 @@ services:
         networks:
             - default
             - dev-network
+    # es5_6运行环境，也是网络名称
+    es5_6:
+        build:
+            # 从根目录下的elasticsearch5.6文件夹下构建
+            context: ./services/elasticsearch5.6
+            args:
+                TIME_ZONE: ${TIME_ZONE}
+                CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        # 容器名称
+        container_name: "${ES5_6_CONTAINER_NAME}"
+        cap_add:
+            - SYS_PTRACE
+        # 端口映射（不需要暴露端口）
+        ports:
+            - "${ES5_6_EXPOSED_PORT}:9200"
+        volumes:
+            # 挂载es配置至容器
+            - ./volumes/elasticsearch/5.6/config/elasticsearch.yml:/usr/local/elasticsearch/config/elasticsearch.yml:rw
+            - ./volumes/elasticsearch/5.6/config/log4j2.properties:/usr/local/elasticsearch/config/log4j2.properties:rw
+            #- ./volumes/elasticsearch/5.6/config/jvm.options:/usr/local/elasticsearch/config/jvm.options:rw
+            # 挂载es数据库目录至容器
+            - ${ES5_6_DATA_PATH}:/usr/local/elasticsearch/data:rw
+            # 挂载es日志目录至容器
+            - ${ES5_6_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
+        restart: always
+        # 网络
+        networks:
+            - default
+            - dev-network
     # es6_8运行环境，也是网络名称
     es6_8:
         build:

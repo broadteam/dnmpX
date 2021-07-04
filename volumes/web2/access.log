@@ -1,2 +1,0 @@
-10.10.0.1 - - [06/Apr/2021:16:26:29 +0000] "GET /index.html HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.81"
-10.10.0.1 - - [06/Apr/2021:16:26:31 +0000] "GET / HTTP/1.1" 200 82773 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.81"

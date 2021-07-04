@@ -14,17 +14,17 @@ RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONT
 # 拷贝package下文件到当前工作目录
 #COPY ./package/* /tmp
 
-RUN apk add --no-cache openjdk11-jre-headless su-exec
+RUN apk add --no-cache openjdk8-jre su-exec
 
 # 必须指定版本和插件一致
-ENV VERSION 7.10.1
+ENV VERSION 5.6.16
 
 # https://mirrors.huaweicloud.com/elasticsearch
-# oss版本可以在alpine中运行
-# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-7.10.1-no-jdk-linux-x86_64.tar.gz
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.16.zip
 
 # es下载源地址（默认的官网太慢）
-ENV DOWNLOAD_URL "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-${VERSION}-no-jdk-linux-x86_64.tar.gz"
+#ENV DOWNLOAD_URL "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${VERSION}.tar.gz"
+ENV DOWNLOAD_URL "https://mirrors.huaweicloud.com/elasticsearch/${VERSION}/elasticsearch-${VERSION}.tar.gz"
 
 # 插件源地址（默认的github太慢）
 ENV PLUGIN_MIRROR "https://github.rc1844.workers.dev"
@@ -57,23 +57,23 @@ RUN apk add --no-cache bash \
     done \
     # 安装ik插件
     && wget -O elasticsearch-analysis-ik.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-ik/releases/download/v${VERSION}/elasticsearch-analysis-ik-${VERSION}.zip \
-    && mkdir -p /usr/local/elasticsearch/plugins/analysis-ik \
-    && unzip elasticsearch-analysis-ik.zip -d /usr/local/elasticsearch/plugins/analysis-ik \
+    && unzip elasticsearch-analysis-ik.zip -d /usr/local/elasticsearch/plugins \
+    # 5系列插件需要改插件目录名称
+    && mv /usr/local/elasticsearch/plugins/elasticsearch /usr/local/elasticsearch/plugins/analysis-ik \
     # 安装pinyin插件
     && wget -O elasticsearch-analysis-pinyin.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-pinyin/releases/download/v${VERSION}/elasticsearch-analysis-pinyin-${VERSION}.zip \
-    && mkdir -p /usr/local/elasticsearch/plugins/analysis-pinyin \
-    && unzip elasticsearch-analysis-pinyin.zip -d /usr/local/elasticsearch/plugins/analysis-pinyin \
+    && unzip elasticsearch-analysis-pinyin.zip -d /usr/local/elasticsearch/plugins \
+    # 5系列插件需要改插件目录名称
+    && mv /usr/local/elasticsearch/plugins/elasticsearch /usr/local/elasticsearch/plugins/analysis-pinyin \
     # 安装腾讯云cos插件
     && wget -O repository-cos.zip ${PLUGIN_MIRROR}/tencentyun/elasticsearch-repository-cos/releases/download/v${VERSION}/repository-cos-${VERSION}.zip \
-    && mkdir -p /usr/local/elasticsearch/plugins/repository-cos \
-    && unzip repository-cos.zip -d /usr/local/elasticsearch/plugins/repository-cos \
-    # 清除缓存（es7+自带了jdk，在docker里删除掉防止占用空间大）
-    && rm -rf /tmp/* /usr/local/elasticsearch/jdk \
+    && unzip repository-cos.zip -d /usr/local/elasticsearch/plugins \
+    # 5系列插件需要改插件目录名称
+    && mv /usr/local/elasticsearch/plugins/elasticsearch /usr/local/elasticsearch/plugins/repository-cos \
+    # 清除缓存
+    && rm -rf /tmp/* \
     && rm -rf /var/cache/apk* \
     && apk del --purge .build-deps
-
-# TODO: remove this (it removes X-Pack ML so it works on Alpine)
-RUN rm -rf /usr/local/elasticsearch/modules/x-pack-ml/platform/linux-x86_64
 
 COPY config/elastic /usr/local/elasticsearch/config
 COPY config/logrotate /etc/logrotate.d/elasticsearch
@@ -87,7 +87,7 @@ ENV PATH /usr/local/elasticsearch/bin:$PATH
 ENV ES_TMPDIR /usr/local/elasticsearch/tmp
 
 # 设置JAVA_HOME环境变量
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk/jre
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk/jre
 
 VOLUME ["/usr/local/elasticsearch/data"]
 

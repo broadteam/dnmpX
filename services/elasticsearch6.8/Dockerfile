@@ -21,7 +21,7 @@ ENV VERSION 6.8.15
 
 # https://mirrors.huaweicloud.com/elasticsearch
 # oss版本可以在alpine中运行
-# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-6.8.16.zip
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-6.8.15.zip
 
 # es下载源地址（默认的官网太慢）
 ENV DOWNLOAD_URL "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-${VERSION}.tar.gz"
@@ -39,7 +39,7 @@ RUN apk add --no-cache bash \
     && set -ex \
     && cd /tmp \
     && echo "===> Install Elasticsearch..." \
-    && wget --progress=bar:force -O elasticsearch.tar.gz "$DOWNLOAD_URL" && tar -xf elasticsearch.tar.gz \
+    && wget -O elasticsearch.tar.gz "$DOWNLOAD_URL" && tar -xf elasticsearch.tar.gz \
     && ls -lah \
     && mv elasticsearch-$VERSION /usr/local/elasticsearch \
     && adduser -D -h /usr/local/elasticsearch elasticsearch \
@@ -56,15 +56,15 @@ RUN apk add --no-cache bash \
     chown -R elasticsearch:elasticsearch "$path"; \
     done \
     # 安装ik插件
-    && wget --progress=bar:force -O elasticsearch-analysis-ik.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-ik/releases/download/v${VERSION}/elasticsearch-analysis-ik-${VERSION}.zip \
+    && wget -O elasticsearch-analysis-ik.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-ik/releases/download/v${VERSION}/elasticsearch-analysis-ik-${VERSION}.zip \
     && mkdir -p /usr/local/elasticsearch/plugins/analysis-ik \
     && unzip elasticsearch-analysis-ik.zip -d /usr/local/elasticsearch/plugins/analysis-ik \
     # 安装pinyin插件
-    && wget --progress=bar:force -O elasticsearch-analysis-pinyin.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-pinyin/releases/download/v${VERSION}/elasticsearch-analysis-pinyin-${VERSION}.zip \
+    && wget -O elasticsearch-analysis-pinyin.zip ${PLUGIN_MIRROR}/medcl/elasticsearch-analysis-pinyin/releases/download/v${VERSION}/elasticsearch-analysis-pinyin-${VERSION}.zip \
     && mkdir -p /usr/local/elasticsearch/plugins/analysis-pinyin \
     && unzip elasticsearch-analysis-pinyin.zip -d /usr/local/elasticsearch/plugins/analysis-pinyin \
     # 安装腾讯云cos插件
-    && wget --progress=bar:force -O repository-cos.zip ${PLUGIN_MIRROR}/tencentyun/elasticsearch-repository-cos/releases/download/v${VERSION}/repository-cos-${VERSION}.zip \
+    && wget -O repository-cos.zip ${PLUGIN_MIRROR}/tencentyun/elasticsearch-repository-cos/releases/download/v${VERSION}/repository-cos-${VERSION}.zip \
     && mkdir -p /usr/local/elasticsearch/plugins/repository-cos \
     && unzip repository-cos.zip -d /usr/local/elasticsearch/plugins/repository-cos \
     # 清除缓存
@@ -75,7 +75,7 @@ RUN apk add --no-cache bash \
 COPY config/elastic /usr/local/elasticsearch/config
 COPY config/logrotate /etc/logrotate.d/elasticsearch
 COPY elastic-entrypoint.sh /
-RUN chmod +x /elastic-entrypoint.sh && chown elasticsearch:elasticsearch /usr/local/elasticsearch/config
+RUN chmod +x /elastic-entrypoint.sh && chown -R elasticsearch:elasticsearch /usr/local/elasticsearch
 COPY docker-healthcheck /usr/local/bin/
 
 WORKDIR /usr/local/elasticsearch
