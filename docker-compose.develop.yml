@@ -104,6 +104,8 @@ services:
             - ${ES5_6_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器
             - ${ES5_6_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
+            # 挂载es快照目录至容器
+            - ${ES5_6_SNAPSHOT_PATH}:/usr/local/elasticsearch/snapshot:rw
         restart: always
         # 网络
         networks:
@@ -148,6 +150,8 @@ services:
             - ${ES6_8_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器
             - ${ES6_8_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
+            # 挂载es快照目录至容器
+            - ${ES6_8_SNAPSHOT_PATH}:/usr/local/elasticsearch/snapshot:rw
         restart: always
         # 网络
         networks:
@@ -192,6 +196,8 @@ services:
             - ${ES7_10_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器
             - ${ES7_10_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
+            # 挂载es快照目录至容器
+            - ${ES7_10_SNAPSHOT_PATH}:/usr/local/elasticsearch/snapshot:rw
         restart: always
         # 网络
         networks:

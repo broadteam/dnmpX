@@ -104,6 +104,8 @@ services:
             - ${ES6_8_DATA_PATH}:/usr/local/elasticsearch/data:rw
             # 挂载es日志目录至容器
             - ${ES6_8_LOGS_PATH}:/usr/local/elasticsearch/logs:rw
+            # 挂载es快照目录至容器
+            - ${ES6_8_SNAPSHOT_PATH}:/usr/local/elasticsearch/snapshot:rw
         restart: always
         # 网络
         networks:
