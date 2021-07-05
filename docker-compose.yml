@@ -26,7 +26,7 @@ services:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
         environment:
-            TIME_ZONE: "$TIMEZONE"
+            TIME_ZONE: "TIME_ZONE"
         privileged: true
         restart: always
         networks:
