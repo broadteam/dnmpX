@@ -73,6 +73,10 @@ RUN docker-php-ext-install -j$(nproc) sockets sysvmsg sysvsem sysvshm xsl
 
 # 关掉默认Opcache缓存
 RUN echo "opcache.enable=Off" >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+
+# 设置yar的超时时间为60000s
+&& echo "yar.timeout=60000" >> /usr/local/etc/php/conf.d/docker-php-ext-yar.ini \
+
 # 统一扩展文件权限
 && chmod -R +x /usr/local/lib/php/extensions/no-debug-non-zts-*/
 
