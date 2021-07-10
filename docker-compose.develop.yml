@@ -278,17 +278,27 @@ services:
         # 容器名称
         container_name: "${PHP7_0_FPM_CONTAINER_NAME}"
         # 容器的权限设置（privileged/cap-add/cap-drop）
+        privileged: true
         cap_add:
             - SYS_PTRACE
         # 端口映射（不需要暴露端口）
         ports:
             - "${PHP7_0_FPM_EXPOSED_PORT}:9000"
+            - "2120:2120"
+            - "2121:2121"
+            - "2123:2123"
+            - "2125:2125"
+            - "2126:2126"
         extra_hosts:
+            - "websocket.dev.com:${MAIN_HOST_IP}"
             - "fairs.dev.com:${MAIN_HOST_IP}"
             - "fairs-server.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            - ./volumes/php/7.0/docker-entrypoint.sh:/usr/bin/docker-entrypoint.sh:rw
+        # 启动命令
+        #command: /bin/sh /usr/bin/docker-entrypoint.sh
         restart: always
         # 网络
         networks:

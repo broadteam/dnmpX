@@ -15,6 +15,11 @@ RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONT
 # 切换工作目录
 WORKDIR /tmp
 
+# 拷贝docker-entrypoint.sh下文件到当前工作目录
+COPY ./docker-entrypoint.sh ./
+
+RUN chmod +x /tmp/docker-entrypoint.sh
+
 # 拷贝package下文件到当前工作目录
 COPY ./package/* ./
 
@@ -37,6 +42,7 @@ RUN apk add --no-cache linux-headers
 RUN apk add --no-cache krb5-dev openldap-dev bzip2-dev curl-dev pcre-dev
 RUN apk add --no-cache libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev libxslt-dev libzip-dev
 RUN apk add --no-cache librdkafka-dev rabbitmq-c rabbitmq-c-dev
+RUN apk add --no-cache libmcrypt-dev
 
 # 编译安装缺少的系统扩展
 RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar exif
@@ -44,6 +50,7 @@ RUN docker-php-ext-install -j$(nproc) gd ldap opcache
 RUN docker-php-ext-install -j$(nproc) pcntl pdo_mysql mysqli
 RUN docker-php-ext-install -j$(nproc) shmop soap
 RUN docker-php-ext-install -j$(nproc) sockets sysvmsg sysvsem sysvshm xsl zip
+RUN docker-php-ext-install -j$(nproc) mcrypt
 
 # 编译redis扩展
 RUN pecl install redis-5.3.4.tgz && docker-php-ext-enable redis
@@ -175,4 +182,8 @@ COPY --from=build_env /usr/bin/fc-list /usr/bin/fc-list
 COPY --from=build_env /usr/bin/fc-pattern /usr/bin/fc-pattern
 COPY --from=build_env /usr/bin/fc-scan /usr/bin/fc-scan
 
+COPY --from=build_env /tmp/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+
 WORKDIR /home/www
+
+#CMD ["/bin/sh","/usr/bin/docker-entrypoint.sh"]
