@@ -296,6 +296,7 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            - ./volumes/php/7.0/php.ini:/usr/local/etc/php/php.ini:rw
             - ./volumes/php/7.0/docker-entrypoint.sh:/usr/bin/docker-entrypoint.sh:rw
         # 启动命令
         #command: /bin/sh /usr/bin/docker-entrypoint.sh
@@ -419,6 +420,7 @@ services:
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
+            - ./volumes/php/7.4/php.ini:/usr/local/etc/php/php.ini:rw
         restart: always
         # 网络
         networks:
