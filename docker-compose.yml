@@ -170,6 +170,8 @@ services:
             - "websocket.dev.com:${MAIN_HOST_IP}"
             - "fairs-v3.dev.com:${MAIN_HOST_IP}"
             - "fairs-api-v3.dev.com:${MAIN_HOST_IP}"
+            - "customer-pc.dev.com:${MAIN_HOST_IP}"
+            - "fair-information.dev.com:${MAIN_HOST_IP}"
         volumes:
             # 挂载web项目目录至容器
             - ${WEB_ROOT_PATH}:/home/www:rw
@@ -203,6 +205,9 @@ services:
         ports:
             - "${PHP7_4_FPM_EXPOSED_PORT}:9000"
         extra_hosts:
+            - "websocket.dev.com:${MAIN_HOST_IP}"
+            - "fairs-v3.dev.com:${MAIN_HOST_IP}"
+            - "fairs-api-v3.dev.com:${MAIN_HOST_IP}"
             - "customer-pc.dev.com:${MAIN_HOST_IP}"
             - "fair-information.dev.com:${MAIN_HOST_IP}"
         volumes:
