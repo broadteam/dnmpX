@@ -53,7 +53,15 @@ docker build -t netmix:latest ./
 
 启动：
 
+桥接模式：
+
 ```
-docker run -d --name netmix --cap-add=NET_ADMIN --hostname netmix -p 8888:8888 -p 2222:22 -v "/data/netmix/config/tinyproxy.conf:/etc/tinyproxy/tinyproxy.conf" -v "/data/netmix/config/sshd_config:/etc/ssh/sshd_config" -v "/data/netmix/config/openvpn.conf:/etc/openvpn/client.conf" netmix:latest
+docker run -d --name netmix --cap-add=NET_ADMIN --hostname netmix --net=bridge -p 8888:8888 -p 2222:22 -v "/data/netmix/config/tinyproxy.conf:/etc/tinyproxy/tinyproxy.conf" -v "/data/netmix/config/sshd_config:/etc/ssh/sshd_config" -v "/data/netmix/config/openvpn.conf:/etc/openvpn/client.conf" netmix:latest
+```
+
+host模式：
+
+```
+docker run -d --name netmix --cap-add=NET_ADMIN --hostname netmix --net=host -p 8888:8888 -p 2222:22 -v "/data/netmix/config/tinyproxy.conf:/etc/tinyproxy/tinyproxy.conf" -v "/data/netmix/config/sshd_config:/etc/ssh/sshd_config" -v "/data/netmix/config/openvpn.conf:/etc/openvpn/client.conf" netmix:latest
 ```
 --net network_my --ip 192.168.10.30
