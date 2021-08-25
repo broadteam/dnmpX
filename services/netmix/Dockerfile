@@ -20,11 +20,6 @@ RUN if [ $CONTAINER_PACKAGE_URL ] ; then sed -i "s/dl-cdn.alpinelinux.org/${CONT
 
 # 安装编译工具
 RUN apk add --no-cache g++ gcc make \
-    #&& apk add --no-cache tinyproxy \
-    #&& rm -rf /etc/tinyproxy/* \
-
-    #&& wget https://github.com/tinyproxy/tinyproxy/releases/download/1.11.0/tinyproxy-1.11.0.tar.gz \
-
     && tar xf tinyproxy-*.tar.gz && cd tinyproxy-* \
     && ./configure && make && make install
 
@@ -83,20 +78,19 @@ RUN chmod -v +x /etc/cont-init.d/* /etc/services.d/* \
 && sed -i "s/Allow 127/#Allow 127/g" /etc/tinyproxy/tinyproxy.conf \
 && sed -i "s/Allow :/#Allow :/g" /etc/tinyproxy/tinyproxy.conf \
 && sed -i "s/#LogFile/LogFile/g" /etc/tinyproxy/tinyproxy.conf \
+&& sed -i "s/#BasicAuth user password/BasicAuth root 123456/g" /etc/tinyproxy/tinyproxy.conf \
 
 # 修改ssh配置
 && sed -i "s/#PermitRootLogin.*/PermitRootLogin yes/g" /etc/ssh/sshd_config && \
    ssh-keygen -t dsa -P "" -f /etc/ssh/ssh_host_dsa_key && \
    ssh-keygen -t rsa -P "" -f /etc/ssh/ssh_host_rsa_key && \
    ssh-keygen -t ecdsa -P "" -f /etc/ssh/ssh_host_ecdsa_key && \
-   ssh-keygen -t ed25519 -P "" -f /etc/ssh/ssh_host_ed25519_key
-   # 修改root密码
-   #echo "root:admin" | chpasswd
+   ssh-keygen -t ed25519 -P "" -f /etc/ssh/ssh_host_ed25519_key && \
+   # 修改root密码为123456
+   echo "root:123456" | chpasswd
 
 # 执行ssh启动命令
 CMD ["/etc/services.d/startup.sh", "-d"]
-#CMD ["/usr/sbin/sshd", "-D"]
-#CMD ["/usr/local/bin/tinyproxy", "-c", "/etc/tinyproxy/tinyproxy.conf"]
 
 # 对外暴露8888/22端口
 EXPOSE 22
